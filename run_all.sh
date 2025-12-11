@@ -26,10 +26,32 @@ fi
 
 echo "[INFO] Activando entorno virtual..."
 source "$VENV_DIR/bin/activate"
+echo "[INFO] Usando Python en: $(command -v python)"
+echo "[INFO] Usando pip en:    $(command -v pip)"
 
 # 2️⃣ Instalar dependencias de forma explícita
 echo "[INFO] Instalando/actualizando dependencias..."
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# Verificación rápida de dependencias críticas
+python - <<'PY'
+import importlib
+modules = ["pandas", "kafka", "pymongo", "streamlit"]
+missing = []
+for mod in modules:
+    try:
+        importlib.import_module(mod)
+    except Exception as exc:  # noqa: BLE001 - mostrar causa al usuario
+        missing.append((mod, exc))
+
+if missing:
+    print("[ERROR] Faltan dependencias tras la instalación:")
+    for mod, exc in missing:
+        print(f"  - {mod}: {exc}")
+    print("Revisa la salida de pip e intenta nuevamente.")
+    raise SystemExit(1)
+PY
 
 # 3️⃣ Levantar infraestructura Docker
 echo "[INFO] Iniciando contenedores (Kafka, MongoDB, UIs)..."
