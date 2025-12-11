@@ -6,6 +6,7 @@ __pycache__/
 *.sqlite
 .parquet
 data/*.csv
+!data/flights.csv
 *.png
 *.jpg
 tmp/
