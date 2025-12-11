@@ -1,26 +1,56 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")" && pwd)"
 cd "$PROJECT_DIR"
+if [ -z "$BASH_VERSION" ]; then
+  echo "[ERROR] Ejecuta este script con bash (ej. 'bash run_all.sh')." >&2
+  exit 1
+fi
 
 echo "== Proyecto vuelos en streaming =="
 
-# 1️⃣ Crear entorno virtual si no existe
-if [ ! -d "venv" ]; then
-  echo "[INFO] Creando entorno virtual..."
-  python3 -m venv venv
+# 1️⃣ Verificar binario de Python y entorno virtual
+PYTHON_BIN="$(command -v python3 || true)"
+if [ -z "$PYTHON_BIN" ]; then
+  echo "[ERROR] No se encontró python3 en el PATH. Instálalo antes de continuar." >&2
+  exit 1
+fi
+
+VENV_DIR="${PROJECT_DIR}/venv"
+if [ ! -d "$VENV_DIR" ]; then
+  echo "[INFO] Creando entorno virtual en $VENV_DIR..."
+  "$PYTHON_BIN" -m venv "$VENV_DIR"
 fi
 
 echo "[INFO] Activando entorno virtual..."
-source venv/bin/activate
+source "$VENV_DIR/bin/activate"
+echo "[INFO] Usando Python en: $(command -v python)"
+echo "[INFO] Usando pip en:    $(command -v pip)"
 
-# 2️⃣ Instalar dependencias si faltan
-echo "[INFO] Comprobando dependencias..."
-pip install -r requirements.txt >/dev/null 2>&1 || {
-  echo "[INFO] Instalando dependencias..."
-  pip install -r requirements.txt
-}
+# 2️⃣ Instalar dependencias de forma explícita
+echo "[INFO] Instalando/actualizando dependencias..."
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+# Verificación rápida de dependencias críticas
+python - <<'PY'
+import importlib
+modules = ["pandas", "kafka", "pymongo", "streamlit"]
+missing = []
+for mod in modules:
+    try:
+        importlib.import_module(mod)
+    except Exception as exc:  # noqa: BLE001 - mostrar causa al usuario
+        missing.append((mod, exc))
+
+if missing:
+    print("[ERROR] Faltan dependencias tras la instalación:")
+    for mod, exc in missing:
+        print(f"  - {mod}: {exc}")
+    print("Revisa la salida de pip e intenta nuevamente.")
+    raise SystemExit(1)
+PY
 
 # 3️⃣ Levantar infraestructura Docker
 echo "[INFO] Iniciando contenedores (Kafka, MongoDB, UIs)..."
