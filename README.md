@@ -10,7 +10,21 @@ CSV → Producer (Python) → Kafka → Consumer (Python) → MongoDB → Stream
 - Docker y Docker Compose instalados
 - Python 3.8 o superior
 
-## Instalación
+## Instalación y ejecución rápida
+
+El script `run_all.sh` automatiza todo el flujo (crea/activa el entorno virtual, instala dependencias, levanta Docker y lanza productor, consumidor y dashboard). Ejecútalo siempre con **bash**:
+
+```bash
+bash run_all.sh
+```
+
+> Si al terminar prefieres ejecutar los scripts manualmente, activa primero el entorno virtual que deja preparado `run_all.sh`:
+>
+> ```bash
+> source venv/bin/activate
+> ```
+
+## Instalación manual
 
 Clonar el proyecto y entrar a la carpeta:
 
@@ -23,10 +37,10 @@ Crear entorno virtual e instalar dependencias:
 ```bash
 python3 -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
+python -m pip install -r requirements.txt
 ```
 
-## Ejecución
+## Ejecución manual
 
 1. Levantar infraestructura:
 

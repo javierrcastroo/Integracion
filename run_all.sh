@@ -8,6 +8,11 @@ if [ -z "$BASH_VERSION" ]; then
   exit 1
 fi
 
+if [ -z "$BASH_VERSION" ]; then
+  echo "[ERROR] Ejecuta este script con bash (ej. 'bash run_all.sh')." >&2
+  exit 1
+fi
+
 echo "== Proyecto vuelos en streaming =="
 
 # 1️⃣ Verificar binario de Python y entorno virtual
