@@ -46,7 +46,7 @@ def create_consumer():
 
 
 # -------------------------
-# 📌 Calidad del dato
+#  Calidad del dato
 # -------------------------
 def apply_data_quality(df: pd.DataFrame):
     df = df.copy()
@@ -97,14 +97,14 @@ def apply_data_quality(df: pd.DataFrame):
 
 
 # -------------------------
-# 📌 Filtrado retrasos
+#  Filtrado retrasos
 # -------------------------
 def is_good_flight(delay):
     return abs(delay) <= 15
 
 
 # -------------------------
-# 🔥 PROCESAMIENTO COMPLETO
+#  PROCESAMIENTO COMPLETO
 # -------------------------
 def process_batch(records):
     if not records:
