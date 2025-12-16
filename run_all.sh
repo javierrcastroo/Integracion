@@ -10,7 +10,7 @@ fi
 
 echo "== Proyecto vuelos en streaming =="
 
-# 1️⃣ Verificar binario de Python y entorno virtual
+#  Verificar binario de Python y entorno virtual
 PYTHON_BIN="$(command -v python3 || true)"
 if [ -z "$PYTHON_BIN" ]; then
   echo "[ERROR] No se encontró python3 en el PATH. Instálalo antes de continuar." >&2
@@ -28,7 +28,7 @@ source "$VENV_DIR/bin/activate"
 echo "[INFO] Usando Python en: $(command -v python)"
 echo "[INFO] Usando pip en:    $(command -v pip)"
 
-# 2️⃣ Instalar dependencias de forma explícita
+# Instalar dependencias de forma explícita
 echo "[INFO] Instalando/actualizando dependencias..."
 python -m pip install --upgrade pip
 python -m pip install -r requirements.txt
@@ -52,33 +52,33 @@ if missing:
     raise SystemExit(1)
 PY
 
-# 3️⃣ Levantar infraestructura Docker
+#  Levantar infraestructura Docker
 echo "[INFO] Iniciando contenedores (Kafka, MongoDB, UIs)..."
 docker compose up -d
 
-# 4️⃣ Dar tiempo a Kafka y Mongo para arrancar
+#  Dar tiempo a Kafka y Mongo para arrancar
 echo "[INFO] Esperando a que la infraestructura esté lista..."
 sleep 25
 
-# 5️⃣ Producer en background
+#  Producer en background
 echo "[INFO] Lanzando Producer..."
 python src/flights_producer.py &
 PRODUCER_PID=$!
 
 sleep 3
 
-# 6️⃣ Consumer en background
+#  Consumer en background
 echo "[INFO] Lanzando Consumer..."
 python src/flights_consumer.py &
 CONSUMER_PID=$!
 
 sleep 3
 
-# 7️⃣ Dashboard Streamlit (foreground)
+#  Dashboard Streamlit (foreground)
 echo "[INFO] Lanzando Dashboard (http://localhost:8501)..."
 streamlit run streamlit_app.py
 
-# 8️⃣ Al cerrar Streamlit → matar producer/consumer
+#  Al cerrar Streamlit → matar producer/consumer
 echo "[INFO] Finalizando Producer/Consumer..."
 kill $PRODUCER_PID $CONSUMER_PID 2>/dev/null || true
 
